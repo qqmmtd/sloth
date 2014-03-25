@@ -1,0 +1,23 @@
+" vimperator 3.3
+
+" fit for left hand
+set hintchars=asdfgqwerzxcv
+" never focus on the first input field when page load
+"set focuscontent=true
+" highlight search keyword
+set hlsearch=true
+" ]] & [[ pattern
+set nextpattern=\\s*下一页|下一张|下一篇|下页|后页\\s*,\\bnext\\b,^>$,^(>>|)$,^(>|),(>|)$,\\bmore\\b
+set previouspattern=\\s*上一页|上一张|上一篇|上页|前页\\s*,\\bprev|previous\\b,^<$,^(<<|)$,^(<|),(<|)$
+
+" function key for left hand
+nnoremap ga <C-p>
+nnoremap ge <C-n>
+nnoremap v <C-o>
+nnoremap V <C-i>
+nnoremap e <C-u>
+nnoremap d <C-d>
+nnoremap x d
+
+" enable passthrough mode on some Google sites
+autocmd LocationChange .* js modes.passAllKeys = /mail\.google\.com/.test(buffer.URL) || /www\.google\.com\/reader\/view\//.test(buffer.URL)

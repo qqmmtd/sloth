@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ImageNameMap>
+    <Partition name="boot">
+        <ImageName>boot.img</ImageName>
+        <ImageName>BY???0??.mbn</ImageName>
+        <ImageName>boot.2knand.img</ImageName>
+    </Partition>
+    <Partition name="system">
+        <ImageName>system.img</ImageName>
+        <ImageName>YY???0??.mbn</ImageName>
+        <ImageName>system.2knand.img</ImageName>
+    </Partition>
+    <Partition name="userdata">
+        <ImageName>userdata.img</ImageName>
+        <ImageName>UY???0??.mbn</ImageName>
+        <ImageName>userdata.2knand.img</ImageName>
+    </Partition>
+    <Partition name="recovery">
+        <ImageName>recovery.img</ImageName>
+        <ImageName>RY???0??.mbn</ImageName>
+    </Partition>
+    <Partition name="custpack">
+        <ImageName>custpack.img</ImageName>
+        <ImageName>MY??ZZ??.mbn</ImageName>
+    </Partition>
+    <Partition name="studypara">
+		<ImageName>studypara.mbn</ImageName>
+		<ImageName>SY????1S.mbn</ImageName>
+    </Partition>
+    <Partition name="securo">
+		<ImageName>security.mbn</ImageName>
+		<ImageName>XY??ZZ??.mbn</ImageName>
+    </Partition>
+</ImageNameMap>

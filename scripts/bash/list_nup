@@ -1,0 +1,17 @@
+#! /bin/bash
+
+# N U P of list
+# usage: list_nup file_a file_b
+list_nup()
+{
+
+	if [[ -r $1 ]] && [[ -r $2 ]]; then
+		mkdir -p _${FUNCNAME[0]}_
+		cat "$1" "$2" | sort -u > _${FUNCNAME[0]}_/u
+		cat "$1" "$2" | sort | uniq -d > _${FUNCNAME[0]}_/n
+		cat "$1" _${FUNCNAME[0]}_/u | sort | uniq -u > _${FUNCNAME[0]}_/ap
+		cat "$2" _${FUNCNAME[0]}_/u | sort | uniq -u > _${FUNCNAME[0]}_/bp
+	fi
+
+	return $?
+}

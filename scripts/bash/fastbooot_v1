@@ -1,0 +1,41 @@
+# usage: fastbooot [imgs_dir_path]
+fastbooot()
+{
+	local _tag=${_tag:-${FUNCNAME[0]}}
+
+	local FASTBOOT='/opt/bin/fastboot'
+	[[ ! -f $FASTBOOT ]] && { echo "$_tag: error: $FASTBOOT is invalid!!!"; return 1; }
+	
+	local imgs_path=${1:-.}
+	[[ ! -d $imgs_path ]] && { echo "$_tag: error: $imgs_path is not a directory!!!"; return 1; }
+	[[ -n $TARGET_PRODUCT ]] && imgs_path="out/target/product/$TARGET_PRODUCT"
+
+	local SUDO=
+	[[ $UID != 0 ]] && SUDO='sudo'
+
+	local imgs=($(cd $imgs_path; ls *.img 2>/dev/null))
+	[[ -z ${imgs[@]} ]] && { echo "$_tag: error: no image in $imgs_path!!!"; return 1; }
+	
+	local default_imgs='boot custpack recovery system userdata'
+	local def=
+	local num=
+	local list=
+	
+	for ((num=0; num<${#imgs[@]}; num++)); do
+		printf "%18s: %-2d\n" ${imgs[$num]%.img} $num
+		if echo $default_imgs | grep ${imgs[$num]%.img} &> /dev/null; then
+			def=$def$num
+		fi
+	done
+	
+	read -p "flash which(s)? [default: $def] " list
+	list=${list:-$def}
+	
+	for ((num=0; num<${#list}; num++)); do
+		[[ -n ${imgs[${list:$num:1}]} ]] && $SUDO $FASTBOOT flash ${imgs[${list:$num:1}]%.img} $imgs_path/${imgs[${list:$num:1}]}
+	done
+
+	gnome-osd-client -f "<message id='eros' hide_timeout='50000' osd_halignment='center' osd_vposition='center' osd_font='WenQuanYi Micro Hei 50'>搞完了，赶紧拔了！</message>"
+
+	return $?
+}
