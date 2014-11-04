@@ -12,8 +12,12 @@ _repo ()
 
     (
         cd $REPOSITORY_DIR/$1
-        echo $'\n\ny' | repo init -u $REMOTE:$1/manifest
+        echo $'\n\ny' | repo init -u $REMOTE:$1/manifest -m $2
         mkdir -p .repo/projects/$ANDROID_SRC_DIR
+        _sync -j4
+        rm .repo/manifest.xml
+        rm .repo/manifest.xml.bak
+        rm -rf *
     )
 }
 
@@ -47,28 +51,61 @@ BEGIN {
     OFS = "\"";
 }
 
-/<project/ {
-    if ($4 ~ "^v[^/]*/'$ANDROID_SRC_DIR'/") {
-        $4 = substr($4, index($4, "/") + 1);
-    } else if ($2 ~ "^amss_....$") {
-        $4 = $2;
-    } else {
-        $4 = "'$ANDROID_SRC_DIR'/" $4;
+/[ \t]*<project/ {
+    iname = 0;
+    ipath = 0;
+    irevision = 0;
+    for (i = 0; i < NF; ++i) {
+        if ($i ~ "name=$") {
+            iname = i + 1;
+        } else if ($i ~ "path=$") {
+            ipath = i + 1;
+        } else if ($i ~ "revision=$") {
+            irevision = i + 1;
+        } else {
+            # other tag
+        }
+    }
+    if (ipath == 0) {
+        if ($iname !~ "^amss_") {
+            $(iname + 1) = " path=\""ANDROID_SRC_DIR"/"$(iname)"\""$(iname + 1);
+        }
+    } else if (ipath > 0) {
+        if ($iname ~ "^amss_") {
+            $ipath = "";
+        } else if ($ipath ~ "^v[^/]*/"ANDROID_SRC_DIR"/") {
+            $ipath = substr($ipath, index($ipath, "/") + 1);
+        } else {
+            $ipath = ANDROID_SRC_DIR"/"$ipath;
+        }
     }
 }
 
-/<copyfile/ {
-    if ($2 ~ "^v[^/]*/'$ANDROID_SRC_DIR'/") {
-        $2 = substr($2, index($2, "/") + 1);
-    } else {
-        $2 = "'$ANDROID_SRC_DIR'/" $2;
+/[ \t]*<copyfile/ {
+    idest = 0;
+    isrc = 0;
+    for (i = 0; i < NF; ++i) {
+        if ($i ~ "dest=$") {
+            idest = i + 1;
+        } else if ($i ~ "src=$") {
+            isrc = i + 1;
+        } else {
+            # other tag
+        }
+    }
+    if (idest > 0) {
+        if ($idest ~ "^v[^/]*/"ANDROID_SRC_DIR"/") {
+            $idest = substr($idest, index($idest, "/") + 1);
+        } else {
+            $idest = ANDROID_SRC_DIR"/"$idest;
+        }
     }
 }
 
 /.*/ {
     printf("%s\n", $0);
 }
-' .repo/manifest.xml.bak > .repo/manifest.xml
+' ANDROID_SRC_DIR=$ANDROID_SRC_DIR .repo/manifest.xml.bak > .repo/manifest.xml
     fi
 }
 
@@ -93,7 +130,8 @@ sync)
     _sync
     ;;
 repo)
-#    _repo "$@"
+    shift
+    _repo "$@"
     ;;
 *)
     echo 'help'

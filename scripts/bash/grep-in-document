@@ -1,0 +1,21 @@
+#!/bin/bash
+# [Gedit Tool]
+# Name=Grep in document
+# Shortcut=<Primary><Shift>f
+# Applicability=all
+# Output=output-panel
+# Input=document
+# Save-files=nothing
+
+
+options='-nsEi';
+pattern=$(zenity --entry \
+                 --title="Grep in document - gedit" \
+                 --text="grep $options" \
+                 --entry-text="$GEDIT_CURRENT_WORD" \
+                 --width=320)
+
+if [[ -n $pattern ]]; then
+    sed 's/\r/\n/g' | eval grep $options \""$pattern"\" | \
+            sed -n 's#^#'"$(basename "$GEDIT_CURRENT_DOCUMENT_PATH"): line "'#p'
+fi
