@@ -1,16 +1,14 @@
 #!/bin/bash
 
-#WEBUSER='nbrootSh'
-#WEBPASSWORD='nb456Sh#'
-#WEBHOST='http://172.16.11.171'
 WEBHOST='https://172.16.12.62/teleweb'
 
 TMPDIR='/tmp/tmp.teleweb'
 
 function fetch()
 {
-#    wget --user=$WEBUSER --password=$WEBPASSWORD --quiet --continue $1 -O $2
-    wget --no-check-certificate --quiet --continue $1 -O $2
+    if [[ $# == 2 ]]; then
+        wget --no-check-certificate --quiet --continue $1 -O $2
+    fi
 }
 
 function download()
@@ -83,16 +81,18 @@ while [[ $rc == 0 ]]; do
 done
 
 if [[ $rc == 2 ]]; then
-    cat > ${TMPDIR}/${path}/flashall.sh << EOF
+    if [[ -f ${TMPDIR}/${path}/8Build_Info.txt || -f ${TMPDIR}/${path}/8build_info.txt ]]; then
+        cat > ${TMPDIR}/${path}/flashall.sh << MEOF
 #!/bin/bash
 
 # Debug
-#ECHO='echo'
+ECHO='echo'
 
-# Set adb & fastboot path here
+# Set tools here
 ADB='adb'
 FASTBOOT='fastboot'
 
+# Define functions
 function do_flash()
 {
     \$ECHO \$FASTBOOT -i 0x1bbb flash \$1 \$2
@@ -108,76 +108,226 @@ function do_format()
     \$ECHO \$FASTBOOT -i 0x1bbb format \$1
 }
 
+function do_unzip()
+{
+    \$ECHO unzip \$1
+}
+
 function do_nothing()
 {
     echo "do nothing: \$@"
 }
 
+function usage()
+{
+    cat << UEOF
+usage: \$0 [-h] [-p] [-s DIR]
+    -h show help
+    -p flash partition table
+    -s set perso directory
+UEOF
+}
+
 # Main
-# reboot into bootloader
-\$ECHO \$ADB reboot bootloader
+# default value
+flashpt=false
+persodir=
 
-# show partitions detail
-echo 'partitions:'
-awk 'BEGIN { FS = "[\" ]"; } /<program/ && !/GPT/ { printf("%s %s%s %s%s %s%s\n", \$14, \$37, \$38, \$16, \$17, \$10, \$11); }' P*.mbn
-
-# gen gpt_both0.bin
-cat O*.mbn G*.mbn > gpt_both0.bin
-
-# flash partition table
-read -p 'flash partition table? [Y|y] ' ans;
-case \$ans in
-[Y|n]) do_flash partition gpt_both0.bin;;
-*) ;;
-esac
-
-# erase partitions
-for pn in \$(sed -n '/GPT/d;/<zeroout"/{s/^.*label="//;s/".*\$//p}' P*.mbn); do
-    do_erase \$pn
-done
-
-# flash images
-for img in *.{mbn,zip}; do
-    case \$img in
-    N*) do_flash modem \$img;;
-    W*) do_flash rpm \$img
-        do_flash rpmbk \$img
+# get options
+while getopts 'hps:' opt; do
+    case \$opt in
+    h)
+        usage
+        exit
         ;;
-    C*) do_flash sbl1 \$img
-        do_flash sbl1bk \$img
+    p)
+        flashpt=true
         ;;
-    T*) do_flash tz \$img
-        do_flash tzbk \$img
+    s)
+        persodir=\$OPTARG
         ;;
-    D*) do_flash sdi \$img;;
-    S*) do_flash fsg \$img;;
-    L*) do_flash aboot \$img
-        do_flash abootbk \$img
-        ;;
-    F*) do_flash tctpersist \$img;;
-    J*) do_flash persist \$img;;
-    E*) do_flash splash \$img;;
-    B*) do_flash boot \$img;;
-    Y*.mbn) do_flash system \$img;;
-    Y*.zip) unzip \$img
-            do_flash system \${img/zip/mbn.raw}
-            ;;
-    I*) do_format cache;;
-    U*) do_format userdata;;
-    R*) do_flash recovery \$img;;
-    M*.mbn) do_flash custpack \$img;;
-    M*.zip) unzip \$img
-            do_flash custpack \${img/zip/mbn.raw}
-            ;;
-    *) do_nothing \$img
-       continue
-       ;;
     esac
 done
+shift \$((\$OPTIND-1))
+
+# show value
+echo
+echo flashpt=\$flashpt
+echo persodir=\$persodir
+echo
+
+# reboot into bootloader
+\$ECHO \$ADB reboot bootloader
+echo
+
+# show partitions detail
+awk 'BEGIN { FS = "[\" ]"; } /<program/ && !/GPT/ { printf("pname[%s] %s[%s] %s[%s] %s[%s]\n", \$14, \$31, \$32, \$16, \$17, \$10, \$11); }' P*.mbn
+echo
+
+# flash partition table
+if \$flashpt; then
+    # confirm again
+    read -p 'flash partition table? [Y|y] ' ans;
+    case \$ans in
+    [Yy])
+        # gen gpt_both0.bin
+        cat O*.mbn G*.mbn > gpt_both0.bin
+
+        do_flash partition gpt_both0.bin
+        echo
+        ;;
+    esac
+fi
+
+# flash msimage (sbl1, tz, rpm, aboot) firstly
+for img in *.mbn; do
+    case \$img in
+    C*)
+        do_flash sbl1 \$img
+        ;;
+    T*)
+        do_flash tz \$img
+        ;;
+    W*)
+        do_flash rpm \$img
+        ;;
+    L*)
+        do_flash aboot \$img
+        ;;
+    esac
+done
+echo
+
+# erase partitions
+for pn in \$(sed -n '/GPT/d;/<zeroout/{s/^.*label="//;s/".*\$//p}' P*.mbn); do
+    do_erase \$pn
+done
+echo
+
+# flash main images
+for img in \$PWD/*.{mbn,zip}; do
+    base=\$(basename \$img)
+    case \$base in
+    N*)
+        do_flash modem \$img
+        ;;
+    W*)
+        #do_flash rpm \$img
+        do_flash rpmbk \$img
+        ;;
+    C*)
+        #do_flash sbl1 \$img
+        do_flash sbl1bk \$img
+        ;;
+    T*)
+        #do_flash tz \$img
+        do_flash tzbk \$img
+        ;;
+    D*)
+        do_flash sdi \$img
+        ;;
+    L*)
+        #do_flash aboot \$img
+        do_flash abootbk \$img
+        ;;
+    F*)
+        do_flash tctpersist \$img
+        ;;
+    J*)
+        do_flash persist \$img
+        ;;
+    B*)
+        do_flash boot \$img
+        ;;
+    Y*.mbn)
+        do_flash system \$img
+        ;;
+    Y*.zip)
+        do_unzip \$img
+        do_flash system \${img/zip/mbn.raw}
+        ;;
+    I*)
+        do_format cache
+        ;;
+    R*)
+        do_flash recovery \$img
+        ;;
+    esac
+done
+echo
+
+# flash perso
+if [[ -d \$persodir ]]; then
+    for img in \$persodir/*.{mbn,zip}; do
+        base=\$(basename \$img)
+        case \$base in
+        s*)
+            do_flash fsg \$img
+            ;;
+        e*)
+            do_flash splash \$img
+            ;;
+        u*)
+            do_format userdata
+            ;;
+        m*.mbn)
+            do_flash custpack \$img
+            ;;
+        m*.zip)
+            do_unzip \$img
+            tmp=\$(echo \$base | tr 'a-z' 'A-Z')
+            do_flash custpack \$(dirname \$img)/\${tmp/MBN.ZIP/mbn.raw}
+            ;;
+        x*)
+            do_nothing \$img
+            ;;
+        esac
+    done
+else
+    for img in \$PWD/*.{mbn,zip}; do
+        base=\$(basename \$img)
+        case \$base in
+        S*)
+            do_flash fsg \$img
+            ;;
+        E*)
+            do_flash splash \$img
+            ;;
+        U*)
+            do_format userdata
+            ;;
+        M*.mbn)
+            do_flash custpack \$img
+            ;;
+        M*.zip)
+            do_unzip \$img
+            do_flash custpack \${img/zip/mbn.raw}
+            ;;
+        x*)
+            do_nothing \$img
+            ;;
+        esac
+    done
+fi
+echo
 
 # reboot
 \$ECHO \$FASTBOOT -i 0x1bbb reboot
-EOF
-    chmod +x ${TMPDIR}/${path}/flashall.sh
+MEOF
+        chmod +x ${TMPDIR}/${path}/flashall.sh
+        cat > ${TMPDIR}/${path}/md5check.sh << CEOF
+#!/bin/bash
+
+sed -i '/txt$/d;s:[^ ]*/::' 8*.txt
+md5sum -c 8*.txt
+CEOF
+        chmod +x ${TMPDIR}/${path}/md5check.sh
+    else
+        cat > ${TMPDIR}/${path}/flashperso.sh << PEOF
+#!/bin/bash
+
+PEOF
+        chmod +x ${TMPDIR}/${path}/flashperso.sh
+    fi
     nautilus ${TMPDIR}/${path}
 fi
