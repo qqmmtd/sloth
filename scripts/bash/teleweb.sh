@@ -4,6 +4,12 @@ WEBHOST='https://172.16.12.62/teleweb'
 
 TMPDIR='/tmp/tmp.teleweb'
 
+CHECKSUMFILES="8checksum.md5 8Build_Info.txt 8build_info.txt"
+
+FLASHTOOL_FASTBOOT=false
+
+FLASHTOOL_TELEWEB=true
+
 function fetch()
 {
     if [[ $# == 2 ]]; then
@@ -29,15 +35,20 @@ function choose()
     local items
     local item
     local formated
+    local cformated
+    local dtof
 
-    formated=$(echo "$(fetch $link -)" | awk '
+    #../ v1A11/ 15-Oct-2015 13:35 - v1A13/ 22-Oct-2015 17:07 -
+    formated=$(echo "$(fetch $link -)" | awk -v top=$2 '
 BEGIN {
     RS="[\r\n]"
     FS="[\" ]*";
 }
 
 /\.\.\// {
-    printf("\n../\n\n\n");
+    if (top != "") {
+        printf("\n../\n\n\n");
+    }
 }
 
 /<a href=/ && !/Index of/ {
@@ -47,12 +58,42 @@ BEGIN {
 
     items=$(echo "$formated" | sed -n 2~4p)
     item=$(echo "$formated" | zenity --list --radiolist \
-                                     --text="Index of /$2" \
-                                     --width=600 --height=800 \
+                                     --text="Index of /${2}\nAll images will be checked if choose P*.mbn" \
+                                     --width=600 --height=400 \
                                      --column '' --column 'Directory' --column 'Time' --column 'Size')
     rc=$?
     if [[ $rc == 0 && $item != */ ]]; then
-        download $1 $2 "$items" \
+        if [[ $item == P*.mbn ]]; then
+            dtof='TRUE'
+        else
+            dtof='FALSE'
+        fi
+        #FALSE 8checksum.md5 22-Oct-2015 16:04 969 TRUE A1A13030BY00.mbn 22-Oct-2015 16:01 164K ...
+        cformated=$(echo "$(fetch $link -)" | awk -v dtof=$dtof -v item=$item '
+BEGIN {
+    RS="[\r\n]"
+    FS="[\" ]*";
+}
+
+/<a href=/ && !/Index of/ && $3 !~ /.*\// {
+    tof = dtof;
+    if ($3 == item) {
+        tof = "TRUE";
+    }
+    printf("%s\n%s\n%s %s\n%s\n", tof, $3, $5, $6, $7);
+}
+')
+echo $cformated
+        citems=$(echo "$cformated" | zenity --list --checklist \
+                                         --text="/${2}" \
+                                         --width=600 --height=600 \
+                                         --separator=" " \
+                                         --column '' --column 'File' --column 'Time' --column 'Size')
+        if [[ -z $citems ]]; then
+            return 0
+        fi
+
+        download $1 $2 "$citems" \
                 | zenity --progress  \
                          --text="Downloading /${2}*" \
                          --pulsate --auto-close \
@@ -62,27 +103,39 @@ BEGIN {
         fi
     else
         if [[ $item != /* ]]; then
-            path=${2}${item}
+            if [[ $item == ../ ]]; then
+                path="/"${2}
+                path=${path%/*/}"/"
+            else
+                path=${2}${item}
+            fi
         fi
         path=${path#/}
     fi
-    echo $path
+    echo "new" $path
 
     return $rc
 }
 
-# Main
-rc=0
-path=
+function gen_md5check()
+{
+    for tmp in $CHECKSUMFILES; do
+        if [[ -f ${TMPDIR}/$1/$tmp ]]; then
+            cat > ${TMPDIR}/$1/md5check.sh << CEOF
+#!/bin/bash
 
-while [[ $rc == 0 ]]; do
-    choose $WEBHOST $path
-    rc=$?    
-done
+sed -i '/txt$/d;s:[^ ]*/::' 8*.{txt,md5}
+md5sum -c 8*.{txt,md5}
+CEOF
+            chmod +x ${TMPDIR}/$1/md5check.sh
+            break
+        fi
+    done
+}    
 
-if [[ $rc == 2 ]]; then
-    if [[ -f ${TMPDIR}/${path}/8Build_Info.txt || -f ${TMPDIR}/${path}/8build_info.txt ]]; then
-        cat > ${TMPDIR}/${path}/flashall.sh << MEOF
+function gen_fastboot_sh()
+{
+    cat > ${TMPDIR}/$1/fastboot_flashall.sh << MEOF
 #!/bin/bash
 
 # Debug
@@ -314,20 +367,104 @@ echo
 # reboot
 \$ECHO \$FASTBOOT -i 0x1bbb reboot
 MEOF
-        chmod +x ${TMPDIR}/${path}/flashall.sh
-        cat > ${TMPDIR}/${path}/md5check.sh << CEOF
-#!/bin/bash
+    chmod +x ${TMPDIR}/$1/fastboot_flashall.sh
+}
 
-sed -i '/txt$/d;s:[^ ]*/::' 8*.txt
-md5sum -c 8*.txt
-CEOF
-        chmod +x ${TMPDIR}/${path}/md5check.sh
-    else
-        cat > ${TMPDIR}/${path}/flashperso.sh << PEOF
-#!/bin/bash
+function gen_teleweb_sh()
+{
+    local projectname
 
-PEOF
-        chmod +x ${TMPDIR}/${path}/flashperso.sh
+    if [[ -n $1 ]]; then
+        projectname=${1%%/*}
     fi
+
+    #TODO
+    firehosepath=
+    rawprogram=
+
+    cat > ${TMPDIR}/$1/teleweb_flashall.sh << TEOF
+#!/bin/bash
+
+FLASHTOOL_TELEWEB_BIN='FlashTool'
+
+for img in *.{mbn,zip}; do
+    case \$img in
+    C*)
+        cp \$img sbl1.mbn
+        ;;
+    T*)
+        cp \$img tz.mbn
+        ;;
+    W*)
+        cp \$img rpm.mbn
+        ;;
+    L*)
+        cp \$img emmc_appsboot.mbn
+        ;;
+    N*)
+        cp \$img NON-HLOS.bin
+        ;;
+    F*)
+        cp \$img tctpersist.img
+        ;;
+    J*)
+        cp \$img persist.img
+        ;;
+    B*)
+        cp \$img boot.img
+        ;;
+    Y*.mbn)
+        cp \$img system.img
+        ;;
+    [Y|y]*.zip)
+        unzip \$img
+        mv \${img/zip/mbn.raw} system.img.raw
+        ;;
+    I*)
+        cp \$img cache.img
+        ;;
+    R*)
+        cp \$img recovery.img
+        ;;
+    [S|s]*)
+        cp \$img study.tar
+        ;;
+    [E|e]*)
+        cp \$img splash.img
+        ;;
+    [U|u]*)
+        cp \$img userdata.img
+        ;;
+    P*)
+        cp \$img rawprogram0.xml
+        ;;
+    esac
+fi
+
+\$FLASHTOOL_TELEWEB_BIN --firehose \$firehosepath --rawprogram rawprogram0.xml --imagedir ./
+TEOF
+    chmod +x ${TMPDIR}/$1/teleweb_flashall.sh
+}
+
+# Main
+rc=0
+path=
+
+while [[ $rc == 0 ]]; do
+    #https://172.16.12.62/teleweb Idol4S/Appli/
+    choose $WEBHOST $path
+    rc=$?
+done
+
+if [[ $rc == 2 ]]; then
+    gen_md5check $path
+
+    if $FLASHTOOL_FASTBOOT; then
+        gen_fastboot_sh $path
+    fi
+    if $FLASHTOOL_TELEWEB; then
+        gen_teleweb_sh $path
+    fi
+
     nautilus ${TMPDIR}/${path}
 fi

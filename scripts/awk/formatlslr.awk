@@ -13,3 +13,4 @@
     print $0;
 }
 
+#awk '/^........w./ && !/^[sc].......w. root root/ { print $0; }'
