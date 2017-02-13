@@ -2,7 +2,7 @@
 
 WEBHOST='https://172.16.12.62/teleweb'
 
-TMPDIR='/tmp/tmp.teleweb'
+#TMPDIR='/tmp/tmp.teleweb'
 
 CHECKSUMFILES="8checksum.md5 8Build_Info.txt 8build_info.txt"
 
@@ -449,6 +449,8 @@ TEOF
 # Main
 rc=0
 path=
+
+TMPDIR=$(zenity --title="Select dir" --file-selection --directory)
 
 while [[ $rc == 0 ]]; do
     #https://172.16.12.62/teleweb Idol4S/Appli/
