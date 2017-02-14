@@ -2,7 +2,16 @@
 
 BEGIN {
     if (ARGC < 3) {
-        printf("\
+        usage();
+    }
+
+    # number of slashes is same as fields
+    FS = "/";
+}
+
+function usage()
+{
+    print "\
 An awk script, can pick out files and copy to target, keep folder tree.\n\
 \n\
 Usage:\n\
@@ -10,13 +19,13 @@ Usage:\n\
     ... | awk -f pickout.awk <p=PREFIX/> <s=STRIP>\n\
 \n\
 Example:\n\
-    echo /a/b/c | awk -f pickout.awk p=/d/ s=2\n\
-    /a/b/c -> /d/b/c, s=2 means strip 2 slashes (/a/)\n");
-        exit 1;
-    }
-
-    # number of slashes is same as fields
-    FS = "/";
+    files listed in an input file modified_files.txt:\n\
+    awk -f pickout.awk p=d/ s=1 modified_files.txt\n\
+\n\
+    files from a pipe, /a/b/c -> /d/b/c, s=2 means strip 2 slashes (/a/):\n\
+    echo /a/b/c | awk -f pickout.awk p=/d/ s=2\
+"
+    exit 1;
 }
 
 {
