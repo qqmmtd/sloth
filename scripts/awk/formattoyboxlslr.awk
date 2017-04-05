@@ -18,22 +18,29 @@
 
 /^\/.*:$/ {
     dir = substr($0, 1, length($0) - 1);
+    if (dir == "/") {
+        dir = "";
+    }
     next;
 }
 
 {
     #$NF = dir "/" $NF;
     #print $0;
-    printf("%s", dir);
     for (i = 1; i < 11; ++i) {
-        printf(" %c", substr($1, i, 1));
+        printf("%c\t", substr($1, i, 1));
     }
-    printf(" %s", $3);
-    printf(" %s", $4);
-    printf(" %d", $2);
-    printf(" %d", $5);
-    printf(" %s", $6);
-    printf(" %s", $7);
-    printf(" %s", $8);
+    printf("%s", $3);
+    printf("\t%s", $4);
+    #printf("\t%d", $2);
+    #printf("\t%d", $5);
+    #printf("\t%s", $6);
+    #printf("\t%s", $7);
+    if ($(NF - 1) == "->") {
+        printf("\t%s/%s\t%s", dir, $(NF - 2), $(NF - 2));
+        printf("\t%s", $NF);
+    } else {
+        printf("\t%s/%s\t%s", dir, $NF, $NF);
+    }
     printf("\n");
 }

@@ -1,0 +1,1 @@
+echo '|/system/bin/minigzip /data/core/%E:%p:%e.gz' > /proc/sys/kernel/core_pattern

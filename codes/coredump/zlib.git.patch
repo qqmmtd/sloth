@@ -1,0 +1,43 @@
+diff --git a/src/test/minigzip.c b/src/test/minigzip.c
+index b3025a4..c4f3c27 100644
+--- a/src/test/minigzip.c
++++ b/src/test/minigzip.c
+@@ -561,6 +561,9 @@ int main(argc, argv)
+     int uncompr = 0;
+     gzFile file;
+     char *bname, outmode[20];
++#ifdef ANDROID_COREGZIP
++    char *path = NULL;
++#endif /* ANDROID_COREGZIP */
+ 
+ #if !defined(NO_snprintf) && !defined(NO_vsnprintf)
+     snprintf(outmode, sizeof(outmode), "%s", "wb6 ");
+@@ -595,6 +598,13 @@ int main(argc, argv)
+       else if ((*argv)[0] == '-' && (*argv)[1] >= '1' && (*argv)[1] <= '9' &&
+                (*argv)[2] == 0)
+         outmode[2] = (*argv)[1];
++#ifdef ANDROID_COREGZIP
++      else if (strcmp(*argv, "-z") == 0) {
++        argc--;
++        argv++;
++        path = strdup(*argv);
++      }
++#endif /* ANDROID_COREGZIP */
+       else
+         break;
+       argc--, argv++;
+@@ -609,7 +619,11 @@ int main(argc, argv)
+             if (file == NULL) error("can't gzdopen stdin");
+             gz_uncompress(file, stdout);
+         } else {
++#ifndef ANDROID_COREGZIP
+             file = gzdopen(fileno(stdout), outmode);
++#else /* ANDROID_COREGZIP */
++            file = gzopen(path, outmode);
++#endif /* ANDROID_COREGZIP */
+             if (file == NULL) error("can't gzdopen stdout");
+             gz_compress(stdin, file);
+         }
+-- 
+2.5.0
+
