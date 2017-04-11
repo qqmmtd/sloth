@@ -9,7 +9,7 @@
 
 #include "comdef.h"
 
-int test[N_ROW * N_COL] = {
+int test[C_UNIT] = {
 #if 0 /* easy */
     5, 3, 0, 0, 7, 0, 0, 0, 0,
     6, 0, 0, 1, 9, 5, 0, 0, 0,
