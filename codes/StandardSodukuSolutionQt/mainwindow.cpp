@@ -7,6 +7,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    /* fix window size */
+    this->setFixedSize(this->width(), this->height());
+
     int orig[C_UNIT] = {
 #if 0 /* easy */
         5, 3, 0, 0, 7, 0, 0, 0, 0,
