@@ -3,8 +3,6 @@
 
 #include <QMainWindow>
 
-#include "standardsodukusolution.h"
-
 namespace Ui {
 class MainWindow;
 }
@@ -16,9 +14,6 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    
-public:
-    Unit grid[C_UNIT];
 
 private slots:
     void on_pushButton_clicked();

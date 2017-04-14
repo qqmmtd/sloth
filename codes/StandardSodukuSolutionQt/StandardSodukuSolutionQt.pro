@@ -12,9 +12,9 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    standardsodukusolution.cpp
+    standardsoduku.cpp
 
 HEADERS  += mainwindow.h \
-    standardsodukusolution.h
+    standardsoduku.h
 
 FORMS    += mainwindow.ui
