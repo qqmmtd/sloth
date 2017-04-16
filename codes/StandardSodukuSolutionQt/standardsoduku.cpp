@@ -26,7 +26,16 @@
     fprintf(stderr, __VA_ARGS__); \
 }
 
+StandardSoduku::StandardSoduku()
+{
+}
+
 StandardSoduku::StandardSoduku(const int data[])
+{
+    reset(data);
+}
+
+void StandardSoduku::reset(const int data[])
 {
     memcpy(this->data, data, sizeof(this->data));
 }

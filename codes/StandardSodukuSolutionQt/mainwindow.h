@@ -1,7 +1,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
+#include <QtWidgets/QMainWindow>
+
+#include "standardsoduku.h"
 
 namespace Ui {
 class MainWindow;
@@ -22,6 +24,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    StandardSoduku *ss;
 };
 
 #endif // MAINWINDOW_H

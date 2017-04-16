@@ -16,6 +16,7 @@ typedef struct Unit_t {
 class StandardSoduku
 {
 public:
+    StandardSoduku();
     StandardSoduku(const int data[]);
     static inline int bitcount(int v);
     static inline int bit2num(int v);
@@ -25,6 +26,7 @@ public:
     static inline int col(const int i) { return i % C_COL; }
     static inline int pos(const int r, const int c) { return r * C_COL + c; }
     static inline int blockHead(const int i) { return pos(row(i) / C_BLK * C_BLK, col(i) / C_BLK * C_BLK); }
+    void reset(const int data[]);
     int solve(int solution[]);
 
 private:

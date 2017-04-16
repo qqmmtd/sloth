@@ -1,8 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "standardsoduku.h"
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -17,6 +15,8 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->tableWidget->setItem(StandardSoduku::row(i), StandardSoduku::col(i), new QTableWidgetItem());
         ui->tableWidget->item(StandardSoduku::row(i), StandardSoduku::col(i))->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     }
+
+    this->ss = new StandardSoduku();
 
 #if 1
     int test[C_UNIT] = {
@@ -64,8 +64,8 @@ void MainWindow::on_pushButton_clicked()
         data[i] = ui->tableWidget->item(StandardSoduku::row(i), StandardSoduku::col(i))->text().toInt();
     }
 
-    StandardSoduku *ss = new StandardSoduku(data);
-    if (0 == ss->solve(solution)) {
+    this->ss->reset(data);
+    if (0 == this->ss->solve(solution)) {
         for (i = 0; i < C_UNIT; ++i) {
             ui->tableWidget->item(StandardSoduku::row(i), StandardSoduku::col(i))->setText(
                         QString::number(solution[i]));
