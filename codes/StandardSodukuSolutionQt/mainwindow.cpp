@@ -1,9 +1,11 @@
+#include <QtDebug>
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow), ss(new StandardSoduku())
 {
     ui->setupUi(this);
 
@@ -14,9 +16,8 @@ MainWindow::MainWindow(QWidget *parent) :
     for (i = 0; i < C_UNIT; ++i) {
         ui->tableWidget->setItem(StandardSoduku::row(i), StandardSoduku::col(i), new QTableWidgetItem());
         ui->tableWidget->item(StandardSoduku::row(i), StandardSoduku::col(i))->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+        ui->tableWidget->item(StandardSoduku::row(i), StandardSoduku::col(i))->setFlags(Qt::ItemIsEnabled);
     }
-
-    this->ss = new StandardSoduku();
 
 #if 1
     int test[C_UNIT] = {
@@ -45,6 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
     for (i = 0; i < C_UNIT; ++i) {
         if (test[i] > 0) {
             ui->tableWidget->item(StandardSoduku::row(i), StandardSoduku::col(i))->setText(QString::number(test[i]));
+            ui->tableWidget->item(StandardSoduku::row(i), StandardSoduku::col(i))->setFlags(Qt::NoItemFlags);
         }
     }
 #endif
@@ -77,6 +79,12 @@ void MainWindow::on_pushButton_2_clicked()
 {
     int i;
     for (i = 0; i < C_UNIT; ++i) {
+        ui->tableWidget->item(StandardSoduku::row(i), StandardSoduku::col(i))->setFlags(Qt::ItemIsEnabled);
         ui->tableWidget->item(StandardSoduku::row(i), StandardSoduku::col(i))->setText(NULL);
     }
+}
+
+void MainWindow::on_tableWidget_itemClicked(QTableWidgetItem *item)
+{
+    qDebug() << item->row() << item->column();
 }

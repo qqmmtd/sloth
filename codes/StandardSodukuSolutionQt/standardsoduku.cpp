@@ -1,63 +1,10 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <iostream>
+#include <iomanip>
+#include <cstring>
 
 #include "standardsoduku.h"
 
-#define DEBUG 0
-#if DEBUG == 2
-#define DBG(...) \
-{ \
-    fprintf(stderr, "%s/%d: ", __FUNCTION__, __LINE__); \
-    fprintf(stderr, __VA_ARGS__); \
-}
-#elif DEBUG == 1
-#define DBG(...) \
-{ \
-    fprintf(stderr, __VA_ARGS__); \
-}
-#elif DEBUG == 0
-#define DBG(...) \
-    do { } while (0)
-#endif
-
-#define ERR(...) \
-{ \
-    fprintf(stderr, __VA_ARGS__); \
-}
-
-StandardSoduku::StandardSoduku()
-{
-}
-
-StandardSoduku::StandardSoduku(const int data[])
-{
-    reset(data);
-}
-
-void StandardSoduku::reset(const int data[])
-{
-    memcpy(this->data, data, sizeof(this->data));
-}
-
-/* bit count */
-int StandardSoduku::bitcount(int v)
-{
-    int count;
-    for (count = 0; v; ++count) {
-        v &= v - 1;
-    }
-    return count;
-}
-
-int StandardSoduku::bit2num(int v)
-{
-    int i;
-    for (i = 0; v; ++i) {
-        v >>= 1;
-    }
-    return i;
-}
+using namespace std;
 
 int StandardSoduku::solve(int solution[])
 {
@@ -102,8 +49,8 @@ int StandardSoduku::recursiveTryPossibleValues(Unit grid[])
         /* some error */
         return -1;
     }
-    DBG("\nTRY: %2d (%2d, %2d) = %d\n",
-            mini, ROW(mini), COL(mini), grid[mini].values);
+//    cerr << "\nTRY: " << setw(2) << mini << " (" << this->row(mini) << ", "
+//         << this->col(mini) << ") = " << grid[mini].values << endl;
 
     /* mini >= 0 */
     for (i = 0; i < C_ROW; ++i) {
@@ -167,8 +114,8 @@ int StandardSoduku::reducePossibleValues(Unit grid[])
         if (found == -1) {
             return mini;
         }
-        DBG("FND: %2d (%2d, %2d) = %d\n",
-                found, ROW(found), COL(found), grid[found].values);
+//        cerr << "FND: " << setw(2) << found << " (" << this->row(found) << ", "
+//             << this->col(found) << ") = " << grid[found].values << endl;
 
         /* current row */
         for (i = row(found) * C_COL; i < (row(found) + 1) * C_COL; ++i) {
@@ -217,20 +164,20 @@ int StandardSoduku::reducePossibleValues(Unit grid[])
 void StandardSoduku::dumpGrid(Unit grid[])
 {
     int i, j;
-    fprintf(stderr, "987654321,987654321,987654321,987654321,987654321,"
-            "987654321,987654321,987654321,987654321,\n");
+    cerr << "987654321,987654321,987654321,987654321,987654321,"
+            "987654321,987654321,987654321,987654321," << endl;
     for (i = 0; i < C_UNIT; ++i) {
         if (grid[i].values < 0) {
-            fprintf(stderr, "%9d", toReadableValue(grid[i].values));
+            cerr << setw(9) << toReadableValue(grid[i].values);
         } else {
             for (j = C_ROW - 1; j >= 0; --j) {
-                fprintf(stderr, "%d", grid[i].values & (1 << j) ? 1 : 0);
+                cerr << setw(1) << (grid[i].values & (1 << j) ? 1 : 0);
             }
         }
-        fprintf(stderr, ",");
+        cerr << ",";
         if (!((i + 1) % C_ROW)) {
-            fprintf(stderr, "\n");
+            cerr << endl;
         }
     }
-    fprintf(stderr, "\n");
+    cerr << endl;
 }

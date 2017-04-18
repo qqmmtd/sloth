@@ -16,22 +16,22 @@ typedef struct Unit_t {
 class StandardSoduku
 {
 public:
-    StandardSoduku();
-    StandardSoduku(const int data[]);
-    static inline int bitcount(int v);
-    static inline int bit2num(int v);
-    static inline int num2bit(const int v) { return 1 << (v - 1); }
-    static inline int exclude(int v, const int e) { return v & ~(num2bit(e)) & V_ALL; }
-    static inline int row(const int i) { return i / C_COL; }
-    static inline int col(const int i) { return i % C_COL; }
-    static inline int pos(const int r, const int c) { return r * C_COL + c; }
-    static inline int blockHead(const int i) { return pos(row(i) / C_BLK * C_BLK, col(i) / C_BLK * C_BLK); }
-    void reset(const int data[]);
+    StandardSoduku() { }
+    StandardSoduku(const int data[]) { reset(data); }
+    static int row(const int i) { return i / C_COL; }
+    static int col(const int i) { return i % C_COL; }
+    void reset(const int data[]) { memcpy(this->data, data, sizeof(this->data)); }
     int solve(int solution[]);
 
 private:
-    static inline int toReadableValue(const int v) { return v < 0 ? -v : 0; }
-    static inline int countPossibleValues(const int v) { return v <= 0 ? 0 : bitcount(v); }
+    int bitcount(int v);
+    int bit2num(int v);
+    int num2bit(const int v) { return 1 << (v - 1); }
+    int exclude(int v, const int e) { return v & ~(num2bit(e)) & V_ALL; }
+    int pos(const int r, const int c) { return r * C_COL + c; }
+    int blockHead(const int i) { return pos(row(i) / C_BLK * C_BLK, col(i) / C_BLK * C_BLK); }
+    int toReadableValue(const int v) { return v < 0 ? -v : 0; }
+    int countPossibleValues(const int v) { return v <= 0 ? 0 : bitcount(v); }
     int recursiveTryPossibleValues(Unit grid[]);
     int reducePossibleValues(Unit grid[]);
     void dumpGrid(Unit grid[]);
@@ -39,5 +39,24 @@ private:
 private:
     int data[C_UNIT];
 };
+
+/* bit count */
+inline int StandardSoduku::bitcount(int v)
+{
+    int count;
+    for (count = 0; v; ++count) {
+        v &= v - 1;
+    }
+    return count;
+}
+
+inline int StandardSoduku::bit2num(int v)
+{
+    int i;
+    for (i = 0; v; ++i) {
+        v >>= 1;
+    }
+    return i;
+}
 
 #endif // STANDARDSODUKU_H
