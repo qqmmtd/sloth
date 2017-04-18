@@ -1,10 +1,7 @@
 #include <iostream>
 #include <iomanip>
-#include <cstring>
 
 #include "standardsoduku.h"
-
-using namespace std;
 
 int StandardSoduku::solve(int solution[])
 {

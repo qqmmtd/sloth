@@ -1,6 +1,10 @@
 #ifndef STANDARDSODUKU_H
 #define STANDARDSODUKU_H
 
+#include <cstring>
+
+using namespace std;
+
 #define C_BLK           3
 #define C_ROW           (C_BLK * C_BLK)             /* 9 */
 #define C_COL           C_ROW
