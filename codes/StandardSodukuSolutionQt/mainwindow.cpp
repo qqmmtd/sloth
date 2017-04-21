@@ -2,6 +2,7 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "dialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -9,8 +10,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    /* fix window size */
-    this->setFixedSize(this->width(), this->height());
+    this->d = new Dialog(this);
+    connect(ui->tableWidget, &QTableWidget::itemClicked, this->d, &Dialog::show9);
 
     int i;
     for (i = 0; i < C_UNIT; ++i) {
@@ -82,9 +83,4 @@ void MainWindow::on_pushButton_2_clicked()
         ui->tableWidget->item(StandardSoduku::row(i), StandardSoduku::col(i))->setFlags(Qt::ItemIsEnabled);
         ui->tableWidget->item(StandardSoduku::row(i), StandardSoduku::col(i))->setText(NULL);
     }
-}
-
-void MainWindow::on_tableWidget_itemClicked(QTableWidgetItem *item)
-{
-    qDebug() << item->row() << item->column();
 }

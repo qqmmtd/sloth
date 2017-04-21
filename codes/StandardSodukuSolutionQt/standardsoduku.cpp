@@ -3,6 +3,10 @@
 
 #include "standardsoduku.h"
 
+using namespace std;
+
+namespace sloth {
+
 int StandardSoduku::solve(int solution[])
 {
     int rc, i;
@@ -178,3 +182,5 @@ void StandardSoduku::dumpGrid(Unit grid[])
     }
     cerr << endl;
 }
+
+} // namespace sloth

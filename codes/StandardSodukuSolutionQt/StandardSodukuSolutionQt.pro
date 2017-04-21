@@ -12,9 +12,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    standardsoduku.cpp
+    standardsoduku.cpp \
+    dialog.cpp
 
 HEADERS  += mainwindow.h \
-    standardsoduku.h
+    standardsoduku.h \
+    dialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    dialog.ui

@@ -3,8 +3,6 @@
 
 #include <cstring>
 
-using namespace std;
-
 #define C_BLK           3
 #define C_ROW           (C_BLK * C_BLK)             /* 9 */
 #define C_COL           C_ROW
@@ -16,6 +14,8 @@ typedef struct Unit_t {
     int values;
     struct Unit_t *next;    /* now unused */
 } Unit;
+
+namespace sloth {
 
 class StandardSoduku
 {
@@ -62,5 +62,7 @@ inline int StandardSoduku::bit2num(int v)
     }
     return i;
 }
+
+} // namespace sloth
 
 #endif // STANDARDSODUKU_H

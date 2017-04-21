@@ -4,7 +4,10 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QTableWidgetItem>
 
+#include "dialog.h"
 #include "standardsoduku.h"
+
+using sloth::StandardSoduku;
 
 namespace Ui {
 class MainWindow;
@@ -23,11 +26,10 @@ private slots:
 
     void on_pushButton_2_clicked();
 
-    void on_tableWidget_itemClicked(QTableWidgetItem *item);
-
 private:
     Ui::MainWindow *ui;
     StandardSoduku *ss;
+    Dialog *d;
 };
 
 #endif // MAINWINDOW_H
