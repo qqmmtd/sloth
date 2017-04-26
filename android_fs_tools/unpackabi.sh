@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
-TOOLS_PATH=/home/zhanghe/opt/android_fs_tools
+TOOLS_PATH=/home/${USER}/opt/android_fs_tools
 
 PROG=$(basename $0)
-
 usage()
 {
     echo "$PROG <boot.img> [output_dir]"

@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 
-TOOLS_PATH=/home/zhanghe/opt/android_fs_tools
+TOOLS_PATH=/home/${USER}/opt/android_fs_tools
 AWK_CMD=$(which awk)
 
 PROG=$(basename $0)
-
 usage()
 {
     echo "$PROG <system.ext4> [output_dir]"
