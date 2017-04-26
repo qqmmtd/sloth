@@ -1,0 +1,24 @@
+unpack boot:
+$ mkdir boot
+$ unpackbootimg -i boot.img -o boot
+
+pack boot:
+see pack_cmdline
+
+unpack ramdisk:
+$ gzip -d boot-ramdisk.gz
+$ mkdir root
+$ cd root
+$ cpio -i < ../boot-ramdisk
+
+pack ramdisk:
+$ ./mkbootfs root | gzip > ramdisk.img
+
+sparse to raw
+$ simg2img system.img system.img.raw
+
+list ext4
+$ debugfs -R 'ls -p' system.img.raw
+
+dump ext4
+$ debugfs -R 'rdump /bin system_out/bin' system.img.raw

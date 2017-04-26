@@ -21,5 +21,5 @@ function ext4_dump(ri, od) {
 }
 
 function usage() {
-    printf("usage: awk -f dumpext4.awk -v ri=system.img.raw -v od=ourdir\n");
+    printf("usage: awk -f ext4rdump.awk -v ri=system.img.raw -v od=ourdir\n");
 }
