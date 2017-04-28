@@ -14,14 +14,14 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->tableWidget, &QTableWidget::itemClicked, this->d, &Dialog::show9);
 
     int i;
-    for (i = 0; i < C_UNIT; ++i) {
+    for (i = 0; i < StandardSoduku::C_UNIT; ++i) {
         ui->tableWidget->setItem(StandardSoduku::row(i), StandardSoduku::col(i), new QTableWidgetItem());
         ui->tableWidget->item(StandardSoduku::row(i), StandardSoduku::col(i))->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
         ui->tableWidget->item(StandardSoduku::row(i), StandardSoduku::col(i))->setFlags(Qt::ItemIsEnabled);
     }
 
 #if 1
-    int test[C_UNIT] = {
+    int test[StandardSoduku::C_UNIT] = {
 #if 0 /* easy */
         5, 3, 0, 0, 7, 0, 0, 0, 0,
         6, 0, 0, 1, 9, 5, 0, 0, 0,
@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
         0, 9, 0, 0, 0, 0, 4, 0, 0,
 #endif
 };
-    for (i = 0; i < C_UNIT; ++i) {
+    for (i = 0; i < StandardSoduku::C_UNIT; ++i) {
         if (test[i] > 0) {
             ui->tableWidget->item(StandardSoduku::row(i), StandardSoduku::col(i))->setText(QString::number(test[i]));
             ui->tableWidget->item(StandardSoduku::row(i), StandardSoduku::col(i))->setFlags(Qt::NoItemFlags);
@@ -61,15 +61,15 @@ MainWindow::~MainWindow()
 void MainWindow::on_pushButton_clicked()
 {
     int i;
-    int data[C_UNIT], solution[C_UNIT];
+    int data[StandardSoduku::C_UNIT], solution[StandardSoduku::C_UNIT];
 
-    for (i = 0; i < C_UNIT; ++i) {
+    for (i = 0; i < StandardSoduku::C_UNIT; ++i) {
         data[i] = ui->tableWidget->item(StandardSoduku::row(i), StandardSoduku::col(i))->text().toInt();
     }
 
     this->ss->reset(data);
     if (0 == this->ss->solve(solution)) {
-        for (i = 0; i < C_UNIT; ++i) {
+        for (i = 0; i < StandardSoduku::C_UNIT; ++i) {
             ui->tableWidget->item(StandardSoduku::row(i), StandardSoduku::col(i))->setText(
                         QString::number(solution[i]));
         }
@@ -79,7 +79,7 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::on_pushButton_2_clicked()
 {
     int i;
-    for (i = 0; i < C_UNIT; ++i) {
+    for (i = 0; i < StandardSoduku::C_UNIT; ++i) {
         ui->tableWidget->item(StandardSoduku::row(i), StandardSoduku::col(i))->setFlags(Qt::ItemIsEnabled);
         ui->tableWidget->item(StandardSoduku::row(i), StandardSoduku::col(i))->setText(NULL);
     }

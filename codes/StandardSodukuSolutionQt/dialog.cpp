@@ -15,8 +15,8 @@ Dialog::Dialog(QWidget *parent) :
     ui->setupUi(this);
 
     int i, j;
-    for (i = 0; i < C_BLK; ++i) {
-        for (j = 0; j < C_BLK; ++j) {
+    for (i = 0; i < StandardSoduku::C_BOX_ROW; ++i) {
+        for (j = 0; j < StandardSoduku::C_BOX_ROW; ++j) {
             ui->table9->item(i, j)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
             ui->table9->item(i, j)->setFlags(Qt::ItemIsEnabled);
         }

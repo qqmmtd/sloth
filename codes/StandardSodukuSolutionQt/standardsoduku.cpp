@@ -119,7 +119,7 @@ int StandardSoduku::reducePossibleValues(Unit grid[])
 //             << this->col(found) << ") = " << grid[found].values << endl;
 
         /* current row */
-        for (i = row(found) * C_COL; i < (row(found) + 1) * C_COL; ++i) {
+        for (i = row(found) * C_COLUMN; i < (row(found) + 1) * C_COLUMN; ++i) {
             if (i == found) {
                 continue;
             }
@@ -131,7 +131,7 @@ int StandardSoduku::reducePossibleValues(Unit grid[])
             }
         }
         /* current column */
-        for (i = col(found); i < C_ROW * C_COL; i += C_COL) {
+        for (i = col(found); i < C_ROW * C_COLUMN; i += C_COLUMN) {
             if (i == found) {
                 continue;
             }
@@ -143,9 +143,9 @@ int StandardSoduku::reducePossibleValues(Unit grid[])
             }
         }
         /* current block */
-        for (i = blockHead(found); i < blockHead(found) + C_COL * C_BLK;
-                i += C_COL) {
-            for (j = 0; j < C_BLK; ++j) {
+        for (i = blockHead(found); i < blockHead(found) + C_COLUMN * C_BOX_ROW;
+                i += C_COLUMN) {
+            for (j = 0; j < C_BOX_ROW; ++j) {
                 if ((i + j) == found) {
                     continue;
                 }
