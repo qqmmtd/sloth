@@ -31,22 +31,22 @@ void SimpleList::dump()
     cerr << endl;
 }
 
-int SimpleList::_insertAfter(Node *target, Node *node)
+SimpleList &SimpleList::_insertAfter(Node *target, Node *node)
 {
     node->prev = target;
     node->next = target->next;
     target->next->prev = node;
     target->next = node;
     ++_size;
-    return _size;
+    return *this;
 }
 
-int SimpleList::_insertBefore(Node *target, Node *node)
+SimpleList &SimpleList::_insertBefore(Node *target, Node *node)
 {
     return _insertAfter(target->prev, node);
 }
 
-int SimpleList::push(Node *node)
+SimpleList &SimpleList::push(Node *node)
 {
     return _insertBefore(head(), node);
 }
@@ -64,31 +64,32 @@ Node *SimpleList::pop()
     return nullptr;
 }
 
-int SimpleList::remove(Node *node)
+SimpleList &SimpleList::remove(Node *node)
 {
     node->prev->next = node->next;
     node->next->prev = node->prev;
     node->prev = nullptr;
     node->next = nullptr;
     --_size;
-    return _size;
+    return *this;
 }
 
-int SimpleList::append(Node *node)
+SimpleList &SimpleList::append(Node *node)
 {
     return _insertAfter(tail(), node);
 }
 
-int SimpleList::insertSorted(Node *node, Compare compare)
+SimpleList &SimpleList::insertSorted(Node *node, Compare compare)
 {
-    if (compare) {
-        Node *h = head();
-        if (h != &_ahead) {
-            if (compare(h, node) >= 0) {
-                return _insertBefore(h, node);
-            }
-            h = h->next;
+    if (!compare) {
+        compare = SimpleList::gt;
+    }
+    Node *h = head();
+    if (h != &_ahead) {
+        if (compare(h, node) >= 0) {
+            return _insertBefore(h, node);
         }
+        h = h->next;
     }
     return append(node);
 }

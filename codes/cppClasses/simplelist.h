@@ -29,51 +29,51 @@ bool eq(_T &a, _T &b)
 class SimpleList
 {
 public:
-    SimpleList();
+    explicit SimpleList();
 
-    bool empty();
-    int size();
-    Node *head();
-    Node *tail();
+    static int gt(Node *a, Node *b)
+    {
+        return a->value - b->value;
+    }
 
-    int push(Node *node);
+    bool empty() const
+    {
+        return _size == 0 ? true : false;
+    }
+
+    int size() const
+    {
+        return _size;
+    }
+
+    Node *head()
+    {
+        return _ahead.next;
+    }
+
+    Node *tail()
+    {
+        return _ahead.prev;
+    }
+
+    SimpleList &push(Node *node);
     Node *pop();
-    int remove(Node *node);
-    int append(Node *node);
+    SimpleList &remove(Node *node);
+    SimpleList &append(Node *node);
 
-    int insertSorted(Node *node, Compare);
+    SimpleList &insertSorted(Node *node, Compare);
 
 public:
     virtual void dump();
 
 protected:
-    int _insertAfter(Node *target, Node *node);
-    int _insertBefore(Node *target, Node *node);
+    SimpleList &_insertAfter(Node *target, Node *node);
+    SimpleList &_insertBefore(Node *target, Node *node);
 
 protected:
     Node _ahead;
     int _size;
 };
-
-inline bool SimpleList::empty()
-{
-    return _size == 0 ? true : false;
-}
-
-inline int SimpleList::size()
-{
-    return _size;
-}
-
-inline Node *SimpleList::head()
-{
-    return _ahead.next;
-}
-
-inline Node *SimpleList::tail()
-{
-    return _ahead.prev;
-}
 
 } // namespace sloth
 

@@ -3,17 +3,14 @@
 
 #include <cstring>
 
-
-struct Unit_t;
-typedef struct Unit_t {
-    int values;
-    struct Unit_t *next;    /* now unused */
-} Unit;
-
 namespace sloth {
 
 class StandardSoduku
 {
+    typedef struct Unit_t {
+        int values;
+    } Unit;
+
 public:
     static const int C_BOX_ROW = 3;
     static const int C_BOX_COLUMN = 3;
@@ -42,6 +39,8 @@ private:
     int recursiveTryPossibleValues(Unit grid[]);
     int reducePossibleValues(Unit grid[]);
     void dumpGrid(Unit grid[]);
+
+    int excludeCandidates(Unit grid[]);
 
 private:
     int data[C_UNIT];

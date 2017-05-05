@@ -183,4 +183,45 @@ void StandardSoduku::dumpGrid(Unit grid[])
     cerr << endl;
 }
 
+
+int StandardSoduku::excludeCandidates(Unit grid[])
+{
+    if (!grid) {
+        cerr << "error: grid is null" << endl;
+        return -1;
+    }
+
+    int i, j, found, c, minc, mini;
+    while (1) {
+        /* find a confirmed unit */
+        found = this->C_UNIT;
+        mini = this->C_UNIT;
+        minc = this->C_ROW + 1;
+        for (i = 0; i < this->C_UNIT; ++i) {
+            c = countPossibleValues(grid[i].values);
+            if (c == 0) {
+                cerr << "warning: conflict in ("
+                     << this->row(i) << ", " << this->col(i)
+                     << ")"
+                     << endl;
+//                this->dumpGrid(grid);
+                return -1;
+            } else if (c == 1) {
+                grid[i].values = -(bit2num(grid[i].values));
+                found = i;
+                break;
+            } else if (c > 1) {
+                if (c < minc) {
+                    mini = i;
+                    minc = c;
+                }
+            }
+        }
+        if (found == this->C_UNIT) {
+            return mini;
+        }
+    }
+}
+
+
 } // namespace sloth
