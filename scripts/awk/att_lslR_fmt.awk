@@ -7,8 +7,8 @@
 ##
 
 BEGIN {
-    ## field separators
-    FS = "[ \t]*";
+    ## field separator
+    FS = "[[:blank:]]+";
 }
 
 ## remove ending \r
@@ -30,6 +30,13 @@ BEGIN {
 ## ignore error lines, e.g.
 # ls: vold: Permission denied
 /^ls: / {
+    next;
+}
+
+## ignore adb message, e.g.
+# adb server version
+# * daemon started successfully *
+/^\* daemon / || /^adb server version/ {
     next;
 }
 
