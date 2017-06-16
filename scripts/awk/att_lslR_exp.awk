@@ -1,4 +1,4 @@
-#!/usr/bin/awk
+#!/usr/bin/env awk -f
 
 ##
 ## usage:

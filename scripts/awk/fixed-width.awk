@@ -1,4 +1,4 @@
-#!/usr/bin/env awk
+#!/usr/bin/env awk -f
 
 BEGIN {
     fixedwidth_test();
@@ -8,12 +8,22 @@ BEGIN {
 ## fixedwidth(s, a, w [, r])
 ##
 ## Splits the string s into the array a on the width list string w, and returns
-## the number of fields. If r is omitted, a comma "," is used as separator of
-## the string w. If last width is "0", the rest of s is used as last field.
+## the number of fields. If r is omitted, the first non-numeric character is
+## used as separator of the string w. If last width is 0, the rest of s is used
+## as last field.
 ##
 function fixedwidth(s, a, w, r,     _wa, _wn, _i, _k) {
     if (r == "") {
-        r = ",";
+        for (_i = 1; _i <= length(w); ++_i) {
+            _k = substr(w, _i, 1);
+            if (_k !~ /^[[:digit:]]$/) {
+                r = _k;
+                break;
+            }
+        }
+        if (r == "") {
+            r = ",";
+        }
     }
     _wn = split(w, _wa, r);
     if (_wn == 0) {

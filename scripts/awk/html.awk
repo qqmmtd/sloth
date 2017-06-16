@@ -1,3 +1,5 @@
+#!/usr/bin/env awk -f
+
 function append() {
 	if (getline) {
 		remain = remain RS $0;

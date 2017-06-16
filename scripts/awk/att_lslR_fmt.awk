@@ -1,4 +1,4 @@
-#!/usr/bin/awk
+#!/usr/bin/env awk -f
 
 ##
 ## usage:
@@ -9,16 +9,8 @@
 BEGIN {
     ## field separator
     FS = "[[:blank:]]+";
-}
-
-## remove ending \r
-/\r$/ {
-    $0 = substr($0, 1, length($0) - 1);
-}
-
-## ignore empty lines
-/^$/ {
-    next;
+    ## record separator
+    RS = "[\n\r]+";
 }
 
 ## ignore directory total size lines, e.g.

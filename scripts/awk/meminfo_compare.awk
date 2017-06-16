@@ -1,37 +1,32 @@
-#!/usr/bin/awk -f
+#!/usr/bin/env awk -f
 
 BEGIN {
-	FS = " ";
+    FS = "[[:blank:]]+";
+    fn = 0;
 }
 
 /^Total PSS by process:/ {
-	fa[FILENAME] = "m";
-	while (getline && $0 ~ /\(pid/) {
-		i = 0;
-		pn = $3;
-		while (va[FILENAME, pn] != "") {
-			++i;
-			pn = $3"["i"]";
-		}
-		pa[pn] = "m";
-		va[FILENAME, pn] = $1;
-	}
+    ++fn;
+    while (getline && $0 != "") {
+        i = 0;
+        p = $3;
+        while (ma[fn, p] != "") {
+            ++i;
+            p = $3"["i"]";
+        }
+        ps[p] = "E";
+        gsub(/,/, "", $2);
+        gsub(/K:/, "", $2);
+        ma[fn, p] = $2;
+    }
+    nextfile;
 }
 
 END {
-	for (v in fa) {
-		printf("%8s ", v);
-	}
-	printf("\n");
-
-	for (v in pa) {
-		for (u in fa) {
-			if (va[u, v] == "") {
-				printf("%8d ", 0);
-			} else {
-				printf("%8d ", va[u, v]);
-			}
-		}
-		printf("%s\n", v);
-	}
+    for (p in ps) {
+        for (f = 1; f <= fn; ++f) {
+            printf("%10d, ", ma[f, p]);
+        }
+        printf("%s\n", p);
+    }
 }

@@ -12,12 +12,14 @@ BEGIN {
     }
 }
 
-function ext4_dump(ri, od) {
-    while ("debugfs -R 'ls -p' "ri | getline) {
+function ext4_dump(ri, od,      _cmd) {
+    _cmd = "debugfs -R 'ls -p' "ri
+    while (_cmd | getline) {
         if ($6 != "." && $6 != ".." && $6 != "") {
             system("debugfs -R 'rdump "$6" "od"' "ri);
         }
     }
+    close(_cmd)
 }
 
 function usage() {

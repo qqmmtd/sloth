@@ -10,8 +10,9 @@ BEGIN {
     }
 }
 
-function ext4_recursive_ls(imgraw, fname, pname, path) {
-    while ("debugfs -R 'ls -p "path"' "imgraw | getline) {
+function ext4_recursive_ls(imgraw, fname, pname, path,      _cmd) {
+    _cmd = "debugfs -R 'ls -p "path"' "imgraw
+    while (_cmd | getline) {
         # not ., .., or last line
         if ($6 != "." && $6 != ".." && $6 != "") {
             system("echo "path"/"$6" >> "pname);
@@ -23,5 +24,6 @@ function ext4_recursive_ls(imgraw, fname, pname, path) {
             }
         }
     }
+    close(_cmd)
 }
 
