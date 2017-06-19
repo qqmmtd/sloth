@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 TOOLS_PATH=/home/${USER}/opt/android_fs_tools
 
@@ -8,6 +8,11 @@ usage()
     echo "$PROG <boot.img> [output_dir]"
     exit 1
 }
+
+if [[ ! -d $TOOLS_PATH ]]; then
+    echo "$PROG please set correct TOOLS_PATH"
+    exit 1 
+fi
 
 ##
 ## main

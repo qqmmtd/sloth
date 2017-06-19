@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 TOOLS_PATH=/home/${USER}/opt/android_fs_tools
 AWK_CMD=$(which awk)
@@ -9,6 +9,11 @@ usage()
     echo "$PROG <system.ext4> [output_dir]"
     exit 1
 }
+
+if [[ ! -d $TOOLS_PATH ]]; then
+    echo "$PROG please set correct TOOLS_PATH"
+    exit 1 
+fi
 
 ##
 ## main

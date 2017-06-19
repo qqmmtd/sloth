@@ -1,24 +1,39 @@
-unpack boot:
+Build tools in Android source
+$ make minigzip mkbootfs mkbootimg sgdisk simg2img ext2simg
+
+Download unpackbootimg from github
+https://github.com/CyanogenMod/android_system_core/blob/cm-14.1/mkbootimg/unpackbootimg
+
+Unpack boot, or use unpackabi.sh
 $ mkdir boot
 $ unpackbootimg -i boot.img -o boot
 
-pack boot:
-see pack_cmdline
-
-unpack ramdisk:
+Unpack ramdisk
 $ gzip -d boot-ramdisk.gz
 $ mkdir root
 $ cd root
 $ cpio -i < ../boot-ramdisk
 
-pack ramdisk:
-$ ./mkbootfs root | gzip > ramdisk.img
+Pack ramdisk, see commands in Android source
+$ make -n ramdisk-nodeps
+or this short command
+$ mkbootfs root | gzip > ramdisk.img
 
-sparse to raw
+Pack boot, see commands in Android source
+$ make -n bootimage-nodeps
+
+Transfer sparse image to raw
 $ simg2img system.img system.img.raw
 
-list ext4
-$ debugfs -R 'ls -p' system.img.raw
+Transfer raw image to sparse
+$ ext2simg system.img.raw system.img
 
-dump ext4
+List files and directories in ext4 image
+$ debugfs -R 'ls -p /bin' system.img.raw
+
+Dump files and directories from ext4 image, or use extractext4.sh
 $ debugfs -R 'rdump /bin system_out/bin' system.img.raw
+
+Show partition table information, more usage see sgdisk help
+sgdisk --print gpt_main0.bin
+sgdisk --android-dump gpt_main0.bin

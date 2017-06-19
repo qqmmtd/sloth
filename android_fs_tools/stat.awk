@@ -1,4 +1,4 @@
-#!/usr/bin/gawk -f
+#!/usr/bin/env awk -f
 
 BEGIN {
     FS = "/";
