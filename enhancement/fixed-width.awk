@@ -1,9 +1,5 @@
 #!/usr/bin/env awk -f
 
-BEGIN {
-    fixedwidth_test();
-}
-
 ##
 ## fixedwidth(s, a, w [, r])
 ##
