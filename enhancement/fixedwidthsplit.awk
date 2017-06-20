@@ -10,7 +10,7 @@ BEGIN {
 ## Splits the target string t into the array a on the width list string w, and
 ## returns the number of fields. If t is not supplied, $0 is used instead. The
 ## string w is splited on non-numeric characters. If the width of the last field
-## is 0, the rest of t is used.
+## is empty, the rest of t is used.
 ##
 function fixedwidthsplit(w, a, t,     _wa, _wn, _i, _k) {
     _wn = split(w, _wa, /[^[:digit:]]+/);
