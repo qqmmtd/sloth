@@ -18,7 +18,6 @@ function quoteescape(c, a, t,    fn, ta, tfn, i, l) {
     if (t == "") {
         t = $0;
     }
-    print t;
     tfn = split(t, ta, c);
     if (tfn == 0) {
         return 0;

@@ -13,7 +13,7 @@ BEGIN {
 ## is empty, the rest of t is used.
 ##
 function fixedwidthsplit(w, a, t,     _wa, _wn, _i, _k) {
-    _wn = split(w, _wa, /[^[:digit:]]+/);
+    _wn = split(w, _wa, /[^[0-9]+/);
     if (_wn == 0) {
         return 0;
     }
