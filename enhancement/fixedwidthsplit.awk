@@ -32,6 +32,7 @@ function fixedwidthsplit(w, a, t,     _wa, _wn, _i, _k) {
 }
 
 function fixedwidthsplit_test(       _wn, _a, _k) {
+#-rw-r--r--  1 xxxxxxx tctnb   1054524 Mar 30 15:26 zyja.txt ->
 #-$
 #rw-r--r--$
 #  1$
