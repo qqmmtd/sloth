@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TOOLS_PATH=/home/${USER}/opt/android_fs_tools
+TOOLS_PATH=${HOME}/opt/android_fs_tools
 AWK_CMD=$(which awk)
 
 PROG=$(basename $0)

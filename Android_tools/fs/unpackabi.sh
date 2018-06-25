@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TOOLS_PATH=/home/${USER}/opt/android_fs_tools
+TOOLS_PATH=${HOME}/opt/android_fs_tools
 
 PROG=$(basename $0)
 usage()
