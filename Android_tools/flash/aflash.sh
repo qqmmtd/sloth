@@ -150,10 +150,24 @@ function parse_arg()
 
 function wait_for_device()
 {
+    local key
+    local found
+
     while true; do
         fastboot_list_devices
         if [[ -n $serialno ]]; then
-            while [[ "fastboot" != ${fastboot_devices[$serialno]} ]]; do
+            found=false
+            while true; do
+                for key in ${!fastboot_devices[@]}; do
+                    if [[ $serialno == ${key%(*} ]] &&
+                            [[ "fastboot" == ${fastboot_devices[$key]} ]]; then
+                        found=true
+                        break;
+                    fi
+                done
+                if [[ "true" == $found ]]; then
+                    break
+                fi
                 echo "wait for bootloader..."
                 sleep 3
                 fastboot_list_devices
@@ -162,13 +176,16 @@ function wait_for_device()
 #            if [[ 1 == ${#fastboot_devices[@]} ]]; then
 #                serialno=${!fastboot_devices[@]}
 #            elif [[ 1 < ${#fastboot_devices[@]} ]]; then
-                select serialno in ${!fastboot_devices[@]}; do
+                unset key
+                select key in ${!fastboot_devices[@]}; do
                     break
                 done
+                if [[ -n $key ]]; then
+                    serialno=${key%(*}
+                fi
 #            fi
         fi
         if [[ -n $serialno ]]; then
-            serialno=${serialno%(*}
             export ANDROID_SERIAL=$serialno
             break
         fi
@@ -178,12 +195,15 @@ function wait_for_device()
 #        if [[ 1 == ${#adb_devices[@]} ]]; then
 #            serialno=${!adb_devices[@]}
 #        elif [[ 1 < ${#adb_devices[@]} ]]; then
-            select serialno in ${!adb_devices[@]}; do
+            unset key
+            select key in ${!adb_devices[@]}; do
                 break
             done
+            if [[ -n $key ]]; then
+                serialno=${key%(*}
+            fi
 #        fi
         if [[ -n $serialno ]]; then
-            serialno=${serialno%(*}
             show_and_exec $ADB -s $serialno reboot bootloader
             continue
         fi
